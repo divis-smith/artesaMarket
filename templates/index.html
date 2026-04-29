@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block title %}Inicio{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 100px 48px 60px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -120px; right: -120px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(26,122,60,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero::after {
+    content: ''; position: absolute; bottom: -80px; left: -80px;
+    width: 360px; height: 360px;
+    background: radial-gradient(circle, rgba(200,113,58,0.07) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-inner { max-width: 700px; text-align: center; position: relative; z-index: 1; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--verde-cl); color: var(--verde);
+    border: 1px solid rgba(26,122,60,0.2);
+    padding: 6px 16px; border-radius: 100px;
+    font-size: 13px; font-weight: 500; margin-bottom: 28px;
+    opacity: 0; animation: fadeUp 0.6s ease forwards 0.1s;
+  }
+  .hero-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(42px, 7vw, 72px); font-weight: 900;
+    line-height: 1.05; color: var(--texto); margin-bottom: 20px;
+    opacity: 0; animation: fadeUp 0.7s ease forwards 0.25s;
+  }
+  .hero-titulo .acento  { color: var(--verde); }
+  .hero-titulo .acento2 { color: var(--tierra); }
+  .hero-sub {
+    font-size: 18px; color: var(--gris); line-height: 1.6;
+    max-width: 520px; margin: 0 auto 36px;
+    opacity: 0; animation: fadeUp 0.7s ease forwards 0.4s;
+  }
+  .hero-btns {
+    display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+    opacity: 0; animation: fadeUp 0.7s ease forwards 0.55s;
+  }
+  .hero-emojis { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+  .emoji-float { position: absolute; font-size: 28px; opacity: 0.18; animation: flotar 4s ease-in-out infinite; }
+  .emoji-float:nth-child(1) { top: 18%; left: 8%;  animation-delay: 0s;   font-size: 32px; }
+  .emoji-float:nth-child(2) { top: 30%; right: 7%; animation-delay: 0.8s; font-size: 24px; }
+  .emoji-float:nth-child(3) { top: 65%; left: 6%;  animation-delay: 1.4s; font-size: 26px; }
+  .emoji-float:nth-child(4) { top: 70%; right: 9%; animation-delay: 0.4s; font-size: 30px; }
+  .emoji-float:nth-child(5) { top: 12%; right: 20%;animation-delay: 2s;   font-size: 22px; }
+  .emoji-float:nth-child(6) { top: 80%; left: 20%; animation-delay: 1.8s; font-size: 20px; }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    background: var(--verde); padding: 24px 48px;
+    display: flex; justify-content: center; gap: 64px; flex-wrap: wrap;
+  }
+  .stat-item { text-align: center; color: white; }
+  .stat-num { font-family: 'Playfair Display'; font-size: 32px; font-weight: 900; }
+  .stat-lbl { font-size: 13px; opacity: 0.8; }
+
+  /* ── CATÁLOGO PREVIEW ── */
+  .preview { padding: 80px 48px; background: var(--blanco); }
+  .catalogo-grid {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px;
+  }
+  .card {
+    background: var(--crema); border-radius: 16px; overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+  .card:hover { transform: translateY(-8px); box-shadow: 0 16px 40px rgba(0,0,0,0.1); }
+  .card-img {
+    height: 180px; background: linear-gradient(135deg, #f0ebe3, #e8e0d5);
+    display: flex; align-items: center; justify-content: center; font-size: 52px;
+  }
+  .card-body { padding: 20px; }
+  .card-body h3 { font-family: 'Playfair Display'; font-size: 18px; margin-bottom: 6px; }
+  .card-body .precio { color: var(--tierra); font-weight: 600; font-size: 16px; }
+  .card-body .artesano-tag { font-size: 12px; color: var(--gris); margin-top: 4px; }
+
+  /* ── CTA VENDER ── */
+  .cta-vender {
+    padding: 80px 48px; text-align: center;
+    background: linear-gradient(135deg, var(--verde-osc), var(--verde));
+    color: white;
+  }
+  .cta-vender h2 { font-family: 'Playfair Display'; font-size: 36px; margin-bottom: 14px; }
+  .cta-vender p { font-size: 17px; opacity: 0.85; max-width: 480px; margin: 0 auto 32px; line-height: 1.6; }
+  .btn-blanco {
+    background: white; color: var(--verde); border: none;
+    padding: 14px 32px; border-radius: 100px;
+    font-family: 'DM Sans'; font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15); display: inline-block;
+  }
+  .btn-blanco:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+
+  @media (max-width: 600px) {
+    .hero { padding: 90px 24px 48px; }
+    .stats-bar { gap: 32px; padding: 20px; }
+    .preview, .cta-vender { padding: 60px 24px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-emojis">
+    <span class="emoji-float">🏺</span>
+    <span class="emoji-float">🧵</span>
+    <span class="emoji-float">💍</span>
+    <span class="emoji-float">🪵</span>
+    <span class="emoji-float">🌿</span>
+    <span class="emoji-float">👜</span>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-badge">🇨🇴 Hecho en Colombia, para el mundo</div>
+    <h1 class="hero-titulo">
+      Artesanías<br/>
+      <span class="acento">colombianas</span><br/>
+      <span class="acento2">directas al mundo</span>
+    </h1>
+    <p class="hero-sub">
+      Conectamos artesanos de todo Colombia con compradores que valoran lo hecho a mano con amor, tradición e identidad cultural.
+    </p>
+    <div class="hero-btns">
+      <a href="{{ url_for('catalogo') }}" class="btn-primary">Ver catálogo</a>
+      {% if session.get('rol') == 'artesano' %}
+        <a href="{{ url_for('vender') }}" class="btn-secondary">+ Publicar producto</a>
+      {% else %}
+        <a href="{{ url_for('registro') }}" class="btn-secondary">Vende tus artesanías</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-num">500+</div><div class="stat-lbl">Artesanos</div></div>
+  <div class="stat-item"><div class="stat-num">32</div><div class="stat-lbl">Departamentos</div></div>
+  <div class="stat-item"><div class="stat-num">12k+</div><div class="stat-lbl">Piezas vendidas</div></div>
+  <div class="stat-item"><div class="stat-num">40+</div><div class="stat-lbl">Países</div></div>
+</div>
+
+<!-- CATÁLOGO PREVIEW -->
+<section class="preview">
+  <div class="section-header">
+    <h2>Nuestro Catálogo</h2>
+    <div class="section-divider"></div>
+  </div>
+  <div class="catalogo-grid">
+    {% for p in productos %}
+    <div class="card">
+      <div class="card-img">{{ p.emoji }}</div>
+      <div class="card-body">
+        <h3>{{ p.nombre }}</h3>
+        <div class="precio">${{ "{:,.0f}".format(p.precio) }} COP</div>
+        {% if p['descripcion'] %}<p style="font-size:13px;color:var(--gris);margin-top:6px;">{{ p.descripcion[:60] }}{% if p.descripcion|length > 60 %}…{% endif %}</p>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div style="text-align:center;margin-top:40px;">
+    <a href="{{ url_for('catalogo') }}" class="btn-primary">Ver catálogo completo →</a>
+  </div>
+</section>
+
+<!-- CTA VENDER -->
+<section class="cta-vender">
+  <h2>¿Eres artesano colombiano?</h2>
+  <p>Únete a nuestra comunidad y lleva tus piezas únicas a compradores de todo el mundo. Sin intermediarios.</p>
+  {% if session.get('rol') == 'artesano' %}
+    <a href="{{ url_for('vender') }}" class="btn-blanco">Publicar mi producto</a>
+  {% else %}
+    <a href="{{ url_for('registro') }}" class="btn-blanco">Registrarse como artesano</a>
+  {% endif %}
+</section>
+{% endblock %}

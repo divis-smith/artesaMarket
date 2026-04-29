@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Iniciar sesión{% endblock %}
+
+{% block extra_head %}
+<style>
+  .auth-wrap {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    padding: 80px 24px;
+    background: radial-gradient(ellipse at top, rgba(26,122,60,0.05) 0%, transparent 60%);
+  }
+  .auth-card {
+    background: var(--blanco); border-radius: 24px; padding: 48px;
+    width: 100%; max-width: 420px; box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+  .auth-logo { text-align: center; margin-bottom: 28px; }
+  .auth-logo span { font-family: 'Playfair Display'; font-size: 26px; font-weight: 900; color: var(--verde); }
+  .auth-logo span em { color: var(--tierra); font-style: normal; }
+  .auth-card h2 { font-family: 'Playfair Display'; font-size: 26px; text-align: center; margin-bottom: 6px; }
+  .auth-card .sub { text-align: center; color: var(--gris); font-size: 14px; margin-bottom: 28px; }
+
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 7px; }
+  .field input {
+    width: 100%; padding: 13px 16px;
+    border: 2px solid rgba(0,0,0,0.1); border-radius: 12px;
+    font-family: 'DM Sans'; font-size: 15px; outline: none;
+    transition: border-color 0.2s; background: var(--crema);
+  }
+  .field input:focus { border-color: var(--verde); background: white; }
+
+  .btn-submit {
+    width: 100%; background: var(--verde); color: white; border: none;
+    padding: 15px; border-radius: 100px; font-family: 'DM Sans'; font-size: 16px;
+    font-weight: 600; cursor: pointer; margin-top: 8px;
+    transition: background 0.2s, transform 0.15s; box-shadow: 0 4px 16px rgba(26,122,60,0.25);
+  }
+  .btn-submit:hover { background: var(--verde-osc); transform: translateY(-2px); }
+
+  .divider { text-align: center; color: var(--gris); font-size: 13px; margin: 20px 0; }
+  .link-row { text-align: center; font-size: 14px; color: var(--gris); }
+  .link-row a { color: var(--verde); font-weight: 600; }
+
+  /* Admin hint */
+  .admin-hint {
+    margin-top: 24px; padding: 14px 18px; border-radius: 12px;
+    background: #f3e8ff; border: 1px solid #d8b4fe;
+    font-size: 13px; color: #7c3aed; text-align: center; line-height: 1.5;
+  }
+  .admin-hint strong { display: block; margin-bottom: 2px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo"><span>Artesa<em>Market</em></span></div>
+    <h2>Iniciar Sesión</h2>
+    <p class="sub">Accede a tu cuenta de ArtesaMarket</p>
+
+    <form method="POST" action="{{ url_for('login') }}">
+      <div class="field">
+        <label>Correo electrónico</label>
+        <input type="email" name="correo" placeholder="tu@correo.com" required autofocus>
+      </div>
+      <div class="field">
+        <label>Contraseña</label>
+        <input type="password" name="password" placeholder="••••••••" required/>
+      </div>
+      <button type="submit" class="btn-submit">Ingresar</button>
+    </form>
+
+    <div class="divider">¿No tienes cuenta?</div>
+    <div class="link-row">
+      <a href="{{ url_for('registro') }}">Crear cuenta gratis →</a>
+    </div>
+
+    <div class="admin-hint">
+      <strong>⚙️ Acceso Administrador</strong>
+      admin@artesamarket.com · contraseña: <code>admin123</code>
+    </div>
+  </div>
+</div>
+{% endblock %}

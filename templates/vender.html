@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Vende tu artesanía{% endblock %}
+
+{% block extra_head %}
+<style>
+  .page-wrap { padding: 100px 48px 60px; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; }
+  .form-card {
+    background: var(--blanco); border-radius: 24px; padding: 48px;
+    width: 100%; max-width: 540px; box-shadow: 0 8px 40px rgba(0,0,0,0.07);
+    border: 1px solid rgba(0,0,0,0.06); margin-top: 20px;
+  }
+  .form-card h1 { font-family: 'Playfair Display'; font-size: 30px; font-weight: 900; margin-bottom: 6px; }
+  .form-card .sub { color: var(--gris); font-size: 15px; margin-bottom: 32px; }
+  .field { margin-bottom: 20px; }
+  .field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 7px; color: var(--texto); }
+  .field input, .field textarea, .field select {
+    width: 100%; padding: 13px 16px;
+    border: 2px solid rgba(0,0,0,0.1); border-radius: 12px;
+    font-family: 'DM Sans'; font-size: 15px; outline: none;
+    transition: border-color 0.2s; background: var(--crema);
+  }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--verde); background: white; }
+  .field textarea { resize: vertical; min-height: 90px; }
+  .emoji-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+  .emoji-opt { font-size: 26px; cursor: pointer; padding: 8px; border-radius: 10px; border: 2px solid transparent; transition: border-color 0.2s, background 0.2s; }
+  .emoji-opt:hover, .emoji-opt.selected { border-color: var(--verde); background: var(--verde-cl); }
+  #emoji-hidden { display: none; }
+  .btn-submit {
+    width: 100%; background: var(--verde); color: white; border: none;
+    padding: 15px; border-radius: 100px; font-family: 'DM Sans'; font-size: 16px;
+    font-weight: 600; cursor: pointer; margin-top: 8px;
+    transition: background 0.2s, transform 0.15s; box-shadow: 0 4px 16px rgba(26,122,60,0.25);
+  }
+  .btn-submit:hover { background: var(--verde-osc); transform: translateY(-2px); }
+  @media (max-width: 600px) { .page-wrap { padding: 90px 16px 48px; } .form-card { padding: 32px 24px; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+  <div class="form-card">
+    <h1>Publica tu <span style="color:var(--tierra)">artesanía</span></h1>
+    <p class="sub">Comparte tu trabajo con compradores de todo el mundo 🌎</p>
+
+    <form method="POST" action="{{ url_for('vender') }}">
+      <div class="field">
+        <label>Nombre del producto *</label>
+        <input type="text" name="nombre" placeholder="Ej: Mochila Wayuu tejida a mano" required/>
+      </div>
+      <div class="field">
+        <label>Precio (COP) *</label>
+        <input type="number" name="precio" placeholder="Ej: 120000" min="1000" required/>
+      </div>
+      <div class="field">
+        <label>Descripción</label>
+        <textarea name="descripcion" placeholder="Cuéntanos sobre tu pieza: materiales, proceso, historia…"></textarea>
+      </div>
+      <div class="field">
+        <label>Ícono representativo</label>
+        <div class="emoji-grid">
+          {% for e in ['🏺','👜','🧵','💍','🪵','🌿','🎨','🧶','🪡','🪘','🎭','🧸'] %}
+          <span class="emoji-opt {% if e == '🏺' %}selected{% endif %}" data-emoji="{{ e }}">{{ e }}</span>
+          {% endfor %}
+        </div>
+        <input type="hidden" name="emoji" id="emoji-hidden" value="🏺"/>
+      </div>
+      <button type="submit" class="btn-submit">Publicar producto 🚀</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const opts = document.querySelectorAll('.emoji-opt');
+  const hidden = document.getElementById('emoji-hidden');
+  opts.forEach(opt => {
+    opt.addEventListener('click', () => {
+      opts.forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      hidden.value = opt.dataset.emoji;
+    });
+  });
+</script>
+{% endblock %}

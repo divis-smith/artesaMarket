@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Artesanos{% endblock %}
+
+{% block extra_head %}
+<style>
+  .page-wrap { padding: 100px 48px 60px; min-height: 100vh; }
+  .page-hero { text-align: center; padding: 40px 0 52px; }
+  .page-hero h1 { font-family: 'Playfair Display'; font-size: clamp(32px,5vw,52px); font-weight: 900; }
+  .page-hero p  { color: var(--gris); font-size: 17px; margin-top: 10px; }
+
+  /* Banner bienvenida artesano */
+  .artesano-banner {
+    max-width: 700px; margin: 0 auto 48px;
+    background: linear-gradient(135deg, var(--verde), var(--verde-osc));
+    color: white; border-radius: 20px; padding: 28px 36px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .artesano-banner .icon { font-size: 48px; flex-shrink: 0; }
+  .artesano-banner h3 { font-family: 'Playfair Display'; font-size: 22px; margin-bottom: 6px; }
+  .artesano-banner p  { font-size: 14px; opacity: 0.85; line-height: 1.5; }
+  .artesano-banner a  { display: inline-block; margin-top: 12px; background: white; color: var(--verde); padding: 9px 20px; border-radius: 100px; font-size: 13px; font-weight: 600; }
+
+  /* Grid artesanos */
+  .grid {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 28px;
+  }
+  .artesano-card {
+    background: var(--blanco); border-radius: 20px; padding: 32px;
+    text-align: center; border: 1px solid rgba(0,0,0,0.06);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .artesano-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,0,0,0.08); }
+  .avatar {
+    width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 16px;
+    background: linear-gradient(135deg, var(--verde-cl), var(--tierra-cl));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+  }
+  .artesano-card h3 { font-family: 'Playfair Display'; font-size: 20px; margin-bottom: 6px; }
+  .artesano-card .region { font-size: 13px; color: var(--tierra); font-weight: 500; margin-bottom: 10px; }
+  .artesano-card .bio { font-size: 13px; color: var(--gris); line-height: 1.5; margin-bottom: 14px; }
+  .artesano-card .badge-prod {
+    display: inline-block; background: var(--verde-cl); color: var(--verde);
+    padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 600;
+  }
+
+  .empty { text-align: center; padding: 80px 0; color: var(--gris); }
+  .empty .icon { font-size: 64px; display: block; margin-bottom: 16px; }
+
+  @media (max-width:600px) { .page-wrap { padding: 90px 20px 48px; } .artesano-banner { flex-direction: column; text-align: center; padding: 24px; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+  <div class="page-hero">
+    <h1>Nuestros <span style="color:var(--verde)">Artesanos</span></h1>
+    <p>Conoce a los maestros detrás de cada pieza única</p>
+  </div>
+
+  {% if session.get('rol') == 'artesano' %}
+  <div class="artesano-banner">
+    <div class="icon">🎨</div>
+    <div>
+      <h3>¡Bienvenido, {{ session.nombre }}!</h3>
+      <p>Ya eres parte de nuestra comunidad de artesanos. Publica tus productos y llega a compradores de todo el mundo.</p>
+      <a href="{{ url_for('vender') }}">+ Publicar producto</a>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if artesanos %}
+  <div class="grid">
+    {% for a in artesanos %}
+    <div class="artesano-card">
+      <div class="avatar">🧑‍🎨</div>
+      <h3>{{ a.nombre }}</h3>
+      {% if a.region %}<p class="region">📍 {{ a.region }}</p>{% endif %}
+      {% if a.bio %}<p class="bio">{{ a.bio }}</p>{% else %}<p class="bio">Artesano colombiano con amor por la tradición.</p>{% endif %}
+      <span class="badge-prod">{{ a.num_productos }} producto{{ 's' if a.num_productos != 1 }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">
+    <span class="icon">🏺</span>
+    <p>Aún no hay artesanos registrados.</p>
+    <a href="{{ url_for('registro') }}" class="btn-primary" style="margin-top:20px;">¡Sé el primero en registrarte!</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block title %}Panel Admin{% endblock %}
+
+{% block extra_head %}
+<style>
+  .admin-wrap { padding: 84px 0 60px; min-height: 100vh; background: #f8f9fb; }
+
+  /* Header admin */
+  .admin-header {
+    background: linear-gradient(135deg, #1e1b4b, #4338ca);
+    color: white; padding: 36px 48px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .admin-header .icon { font-size: 48px; }
+  .admin-header h1 { font-family: 'Playfair Display'; font-size: 30px; font-weight: 900; }
+  .admin-header p  { opacity: 0.75; font-size: 14px; margin-top: 4px; }
+
+  /* Stats */
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+    gap: 20px; padding: 32px 48px 0;
+  }
+  .stat-card {
+    background: white; border-radius: 16px; padding: 24px;
+    text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  }
+  .stat-card .num { font-family: 'Playfair Display'; font-size: 38px; font-weight: 900; }
+  .stat-card .lbl { font-size: 13px; color: var(--gris); margin-top: 4px; }
+  .stat-card.verde .num { color: var(--verde); }
+  .stat-card.tierra .num { color: var(--tierra); }
+  .stat-card.purpura .num { color: #7c3aed; }
+  .stat-card.azul .num { color: #2563eb; }
+
+  /* Tablas */
+  .tables { padding: 32px 48px; display: flex; flex-direction: column; gap: 40px; }
+  .table-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
+  .table-title {
+    padding: 20px 28px; font-family: 'Playfair Display'; font-size: 20px; font-weight: 900;
+    border-bottom: 1px solid rgba(0,0,0,0.06); display: flex; align-items: center; gap: 10px;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 13px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gris); background: #fafafa; text-align: left; }
+  td { padding: 14px 20px; font-size: 14px; border-top: 1px solid rgba(0,0,0,0.04); vertical-align: middle; }
+  tr:hover td { background: #fafafa; }
+  .badge-rol { font-size: 11px; padding: 3px 10px; border-radius: 100px; font-weight: 700; text-transform: uppercase; }
+  .badge-artesano { background: var(--tierra-cl); color: var(--tierra); }
+  .badge-admin    { background: #ede9fe; color: #7c3aed; }
+  .badge-cliente  { background: var(--verde-cl); color: var(--verde); }
+  .btn-del {
+    background: #fef2f2; color: #dc2626; border: none;
+    padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .btn-del:hover { background: #fee2e2; }
+  .no-data { padding: 32px; text-align: center; color: var(--gris); font-size: 14px; }
+
+  @media (max-width: 700px) {
+    .admin-header { padding: 28px 20px; }
+    .stats-grid { padding: 20px; }
+    .tables { padding: 20px; }
+    th, td { padding: 10px 14px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-wrap">
+
+  <!-- HEADER -->
+  <div class="admin-header">
+    <div class="icon">⚙️</div>
+    <div>
+      <h1>Panel de Administración</h1>
+      <p>ArtesaMarket · Acceso restringido</p>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card verde">
+      <div class="num">{{ stats.total_usuarios }}</div>
+      <div class="lbl">Usuarios totales</div>
+    </div>
+    <div class="stat-card tierra">
+      <div class="num">{{ stats.total_artesanos }}</div>
+      <div class="lbl">Artesanos</div>
+    </div>
+    <div class="stat-card azul">
+      <div class="num">{{ stats.total_clientes }}</div>
+      <div class="lbl">Clientes</div>
+    </div>
+    <div class="stat-card purpura">
+      <div class="num">{{ stats.total_productos }}</div>
+      <div class="lbl">Productos</div>
+    </div>
+  </div>
+
+  <!-- TABLAS -->
+  <div class="tables">
+
+    <!-- USUARIOS -->
+    <div class="table-card">
+      <div class="table-title">👥 Usuarios registrados</div>
+      {% if usuarios %}
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th><th>Nombre</th><th>Correo</th><th>Rol</th><th>Región</th><th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in usuarios %}
+          <tr>
+            <td style="color:var(--gris)">#{{ u.id }}</td>
+            <td><strong>{{ u.nombre }}</strong></td>
+            <td>{{ u.email }}</td>
+            <td><span class="badge-rol badge-{{ u.rol }}">{{ u.rol }}</span></td>
+            <td>{{ u.region or '—' }}</td>
+            <td>
+              {% if u.rol != 'admin' %}
+              <a href="{{ url_for('eliminar_usuario', uid=u.id) }}"
+                 onclick="return confirm('¿Eliminar usuario {{ u.nombre }}?')"
+                 class="btn-del">Eliminar</a>
+              {% else %}
+              <span style="font-size:12px;color:var(--gris)">Protegido</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="no-data">Sin usuarios registrados.</p>
+      {% endif %}
+    </div>
+
+    <!-- PRODUCTOS -->
+    <div class="table-card">
+      <div class="table-title">🏺 Productos publicados</div>
+      {% if productos %}
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th><th>Producto</th><th>Precio</th><th>Artesano</th><th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in productos %}
+          <tr>
+            <td style="color:var(--gris)">#{{ p.id }}</td>
+            <td>{{ p.emoji }} <strong>{{ p.nombre }}</strong></td>
+            <td style="color:var(--tierra);font-weight:600">${{ "{:,.0f}".format(p.precio) }} COP</td>
+            <td>{{ p['artesano'] or '—' }}</td>
+            <td>
+              <a href="{{ url_for('eliminar_producto', pid=p.id) }}"
+                 onclick="return confirm('¿Eliminar producto {{ p.nombre }}?')"
+                 class="btn-del">Eliminar</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="no-data">Sin productos publicados.</p>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

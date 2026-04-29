@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}Crear cuenta{% endblock %}
+
+{% block extra_head %}
+<style>
+  .auth-wrap {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    padding: 90px 24px 60px;
+    background: radial-gradient(ellipse at top, rgba(26,122,60,0.05) 0%, transparent 60%);
+  }
+  .auth-card {
+    background: var(--blanco); border-radius: 24px; padding: 48px;
+    width: 100%; max-width: 480px; box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+  .auth-logo { text-align: center; margin-bottom: 24px; }
+  .auth-logo span { font-family: 'Playfair Display'; font-size: 26px; font-weight: 900; color: var(--verde); }
+  .auth-logo span em { color: var(--tierra); font-style: normal; }
+  .auth-card h2 { font-family: 'Playfair Display'; font-size: 26px; text-align: center; margin-bottom: 6px; }
+  .auth-card .sub { text-align: center; color: var(--gris); font-size: 14px; margin-bottom: 28px; }
+
+  /* Selector de rol */
+  .rol-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .rol-opt { position: relative; }
+  .rol-opt input[type=radio] { position: absolute; opacity: 0; width: 0; height: 0; }
+  .rol-label {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    padding: 20px 16px; border: 2px solid rgba(0,0,0,0.1); border-radius: 16px;
+    cursor: pointer; text-align: center; transition: border-color 0.2s, background 0.2s;
+    background: var(--crema);
+  }
+  .rol-label:hover { border-color: var(--verde); }
+  .rol-opt input:checked + .rol-label { border-color: var(--verde); background: var(--verde-cl); }
+  .rol-icon { font-size: 36px; }
+  .rol-name { font-weight: 700; font-size: 15px; color: var(--texto); }
+  .rol-desc { font-size: 12px; color: var(--gris); line-height: 1.4; }
+  .rol-opt input:checked + .rol-label .rol-name { color: var(--verde); }
+
+  /* Campos extras condicionales */
+  .artesano-fields { display: none; }
+  .artesano-fields.visible { display: block; }
+
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 7px; }
+  .field input, .field textarea {
+    width: 100%; padding: 13px 16px;
+    border: 2px solid rgba(0,0,0,0.1); border-radius: 12px;
+    font-family: 'DM Sans'; font-size: 15px; outline: none;
+    transition: border-color 0.2s; background: var(--crema);
+  }
+  .field input:focus, .field textarea:focus { border-color: var(--verde); background: white; }
+  .field textarea { min-height: 75px; resize: vertical; }
+
+  .btn-submit {
+    width: 100%; background: var(--verde); color: white; border: none;
+    padding: 15px; border-radius: 100px; font-family: 'DM Sans'; font-size: 16px;
+    font-weight: 600; cursor: pointer; margin-top: 8px;
+    transition: background 0.2s, transform 0.15s; box-shadow: 0 4px 16px rgba(26,122,60,0.25);
+  }
+  .btn-submit:hover { background: var(--verde-osc); transform: translateY(-2px); }
+  .divider { text-align: center; color: var(--gris); font-size: 13px; margin: 20px 0; }
+  .link-row { text-align: center; font-size: 14px; color: var(--gris); }
+  .link-row a { color: var(--verde); font-weight: 600; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo"><span>Artesa<em>Market</em></span></div>
+    <h2>Crear cuenta</h2>
+    <p class="sub">¿Cómo quieres unirte a ArtesaMarket?</p>
+
+    <form method="POST" action="{{ url_for('registro') }}">
+
+      <!-- SELECTOR DE ROL -->
+      <div class="rol-selector">
+        <div class="rol-opt">
+          <input type="radio" name="rol" id="rol-cliente" value="cliente" checked/>
+          <label class="rol-label" for="rol-cliente">
+            <span class="rol-icon">🛍️</span>
+            <span class="rol-name">Cliente</span>
+            <span class="rol-desc">Quiero comprar artesanías únicas</span>
+          </label>
+        </div>
+        <div class="rol-opt">
+          <input type="radio" name="rol" id="rol-artesano" value="artesano"/>
+          <label class="rol-label" for="rol-artesano">
+            <span class="rol-icon">🎨</span>
+            <span class="rol-name">Artesano</span>
+            <span class="rol-desc">Quiero vender mis creaciones</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- CAMPOS COMUNES -->
+      <div class="field">
+        <label>Nombre completo</label>
+        <input type="text" name="nombre" placeholder="Tu nombre" required/>
+      </div>
+      <div class="field">
+        <label>Correo electrónico</label>
+        <input type="email" name="correo" placeholder="tu@correo.com" required/>
+      </div>
+      <div class="field">
+        <label>Contraseña</label>
+        <input type="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6"/>
+      </div>
+
+      <!-- CAMPOS EXTRA PARA ARTESANO -->
+      <div class="artesano-fields" id="artesano-extra">
+        <div class="field">
+          <label>Región / Departamento 📍</label>
+          <input type="text" name="region" placeholder="Ej: Boyacá, La Guajira…"/>
+        </div>
+        <div class="field">
+          <label>Cuéntanos sobre tu trabajo ✍️</label>
+          <textarea name="bio" placeholder="¿Qué tipo de artesanías haces? ¿Cuál es tu tradición?"></textarea>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit" id="btn-texto">Crear cuenta como Cliente</button>
+    </form>
+
+    <div class="divider">¿Ya tienes cuenta?</div>
+    <div class="link-row"><a href="{{ url_for('login') }}">Iniciar sesión →</a></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const radios = document.querySelectorAll('input[name="rol"]');
+  const extra  = document.getElementById('artesano-extra');
+  const btn    = document.getElementById('btn-texto');
+
+  radios.forEach(r => {
+    r.addEventListener('change', () => {
+      if (r.value === 'artesano') {
+        extra.classList.add('visible');
+        btn.textContent = 'Crear cuenta como Artesano 🎨';
+      } else {
+        extra.classList.remove('visible');
+        btn.textContent = 'Crear cuenta como Cliente 🛍️';
+      }
+    });
+  });
+</script>
+{% endblock %}
