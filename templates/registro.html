@@ -2,128 +2,245 @@
 {% block title %}Crear cuenta{% endblock %}
 
 {% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
-  .auth-wrap {
-    min-height: 100vh; display: flex; align-items: center; justify-content: center;
-    padding: 90px 24px 60px;
-    background: radial-gradient(ellipse at top, rgba(26,122,60,0.05) 0%, transparent 60%);
-  }
-  .auth-card {
-    background: var(--blanco); border-radius: 24px; padding: 48px;
-    width: 100%; max-width: 480px; box-shadow: 0 8px 40px rgba(0,0,0,0.08);
-    border: 1px solid rgba(0,0,0,0.06);
-  }
-  .auth-logo { text-align: center; margin-bottom: 24px; }
-  .auth-logo span { font-family: 'Playfair Display'; font-size: 26px; font-weight: 900; color: var(--verde); }
-  .auth-logo span em { color: var(--tierra); font-style: normal; }
-  .auth-card h2 { font-family: 'Playfair Display'; font-size: 26px; text-align: center; margin-bottom: 6px; }
-  .auth-card .sub { text-align: center; color: var(--gris); font-size: 14px; margin-bottom: 28px; }
+  body { font-family: 'Plus Jakarta Sans', sans-serif; }
 
-  /* Selector de rol */
-  .rol-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .auth-page {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-top: 64px;
+  }
+
+  /* ── LADO IZQUIERDO ── */
+  .auth-deco {
+    background: linear-gradient(160deg, #7c2d12 0%, #c8713a 50%, #1a7a3c 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 60px 48px; position: relative; overflow: hidden;
+  }
+  .auth-deco::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .deco-badge {
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+    color: white; font-size: 12px; font-weight: 600; letter-spacing: 2px;
+    text-transform: uppercase; padding: 8px 20px; border-radius: 100px; margin-bottom: 32px;
+  }
+  .deco-emoji { font-size: 68px; margin-bottom: 24px; }
+  .deco-title {
+    font-family: 'Fraunces', serif; font-size: 40px; font-weight: 900;
+    color: white; text-align: center; line-height: 1.2; margin-bottom: 16px;
+  }
+  .deco-title em { font-style: italic; color: #fdd09a; }
+  .deco-sub { color: rgba(255,255,255,0.75); text-align: center; font-size: 15px; line-height: 1.6; max-width: 280px; margin-bottom: 40px; }
+  .deco-roles { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; max-width: 300px; }
+  .deco-role-card {
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 16px; padding: 20px 16px; text-align: center;
+  }
+  .deco-role-card .ico { font-size: 32px; margin-bottom: 8px; }
+  .deco-role-card .name { font-weight: 700; color: white; font-size: 14px; }
+  .deco-role-card .desc { color: rgba(255,255,255,0.65); font-size: 12px; margin-top: 4px; line-height: 1.4; }
+
+  /* ── LADO DERECHO ── */
+  .auth-form-side {
+    display: flex; align-items: center; justify-content: center;
+    padding: 60px 48px; background: #fdf8f2; overflow-y: auto;
+  }
+  .auth-box { width: 100%; max-width: 420px; }
+
+  .auth-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Fraunces', serif; font-size: 24px; font-weight: 900;
+    color: #1a7a3c; margin-bottom: 36px;
+  }
+  .auth-logo span { color: #c8713a; }
+
+  .auth-box h2 {
+    font-family: 'Fraunces', serif; font-size: 30px; font-weight: 900;
+    color: #1a1a1a; margin-bottom: 6px;
+  }
+  .auth-box .auth-sub { color: #777; font-size: 15px; margin-bottom: 30px; }
+
+  /* Selector rol */
+  .rol-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px; }
   .rol-opt { position: relative; }
-  .rol-opt input[type=radio] { position: absolute; opacity: 0; width: 0; height: 0; }
+  .rol-opt input { position: absolute; opacity: 0; width: 0; height: 0; }
   .rol-label {
     display: flex; flex-direction: column; align-items: center; gap: 8px;
-    padding: 20px 16px; border: 2px solid rgba(0,0,0,0.1); border-radius: 16px;
-    cursor: pointer; text-align: center; transition: border-color 0.2s, background 0.2s;
-    background: var(--crema);
+    padding: 20px 14px; border: 2px solid #e8e2d8; border-radius: 16px;
+    cursor: pointer; text-align: center; background: white;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
   }
-  .rol-label:hover { border-color: var(--verde); }
-  .rol-opt input:checked + .rol-label { border-color: var(--verde); background: var(--verde-cl); }
-  .rol-icon { font-size: 36px; }
-  .rol-name { font-weight: 700; font-size: 15px; color: var(--texto); }
-  .rol-desc { font-size: 12px; color: var(--gris); line-height: 1.4; }
-  .rol-opt input:checked + .rol-label .rol-name { color: var(--verde); }
+  .rol-label:hover { border-color: #1a7a3c; transform: translateY(-2px); }
+  .rol-opt input:checked + .rol-label {
+    border-color: #1a7a3c; background: #e8f5ee;
+    box-shadow: 0 4px 16px rgba(26,122,60,0.15);
+  }
+  .rol-label .ico { font-size: 34px; }
+  .rol-label .nm  { font-weight: 700; font-size: 14px; color: #1a1a1a; }
+  .rol-opt input:checked + .rol-label .nm { color: #1a7a3c; }
+  .rol-label .ds  { font-size: 11px; color: #999; line-height: 1.4; }
 
-  /* Campos extras condicionales */
-  .artesano-fields { display: none; }
-  .artesano-fields.visible { display: block; }
-
+  /* Campos */
   .field { margin-bottom: 18px; }
-  .field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 7px; }
+  .field label { display: block; font-size: 13px; font-weight: 700; color: #333; margin-bottom: 7px; }
+  .field-wrap { position: relative; }
+  .field-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); font-size: 16px; pointer-events: none; }
   .field input, .field textarea {
-    width: 100%; padding: 13px 16px;
-    border: 2px solid rgba(0,0,0,0.1); border-radius: 12px;
-    font-family: 'DM Sans'; font-size: 15px; outline: none;
-    transition: border-color 0.2s; background: var(--crema);
+    width: 100%; padding: 13px 15px 13px 42px;
+    border: 2px solid #e8e2d8; border-radius: 13px;
+    font-family: 'Plus Jakarta Sans'; font-size: 15px; color: #1a1a1a;
+    background: white; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
   }
-  .field input:focus, .field textarea:focus { border-color: var(--verde); background: white; }
-  .field textarea { min-height: 75px; resize: vertical; }
+  .field textarea { padding-left: 15px; min-height: 80px; resize: vertical; }
+  .field input:focus, .field textarea:focus {
+    border-color: #1a7a3c;
+    box-shadow: 0 0 0 4px rgba(26,122,60,0.08);
+  }
+  .field input::placeholder, .field textarea::placeholder { color: #bbb; }
+
+  .artesano-extra { overflow: hidden; max-height: 0; transition: max-height 0.4s ease, opacity 0.3s; opacity: 0; }
+  .artesano-extra.visible { max-height: 300px; opacity: 1; }
+
+  .section-sep {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; font-weight: 700; color: #c8713a;
+    letter-spacing: 1px; text-transform: uppercase; margin: 4px 0 18px;
+  }
+  .section-sep::before, .section-sep::after {
+    content: ''; flex: 1; height: 1px; background: #e8d5c0;
+  }
 
   .btn-submit {
-    width: 100%; background: var(--verde); color: white; border: none;
-    padding: 15px; border-radius: 100px; font-family: 'DM Sans'; font-size: 16px;
-    font-weight: 600; cursor: pointer; margin-top: 8px;
-    transition: background 0.2s, transform 0.15s; box-shadow: 0 4px 16px rgba(26,122,60,0.25);
+    width: 100%; padding: 16px;
+    background: linear-gradient(135deg, #1a7a3c, #0f4e25);
+    color: white; border: none; border-radius: 14px;
+    font-family: 'Plus Jakarta Sans'; font-size: 16px; font-weight: 700;
+    cursor: pointer; margin-top: 8px;
+    box-shadow: 0 6px 20px rgba(26,122,60,0.35);
+    transition: transform 0.15s, box-shadow 0.15s;
   }
-  .btn-submit:hover { background: var(--verde-osc); transform: translateY(-2px); }
-  .divider { text-align: center; color: var(--gris); font-size: 13px; margin: 20px 0; }
-  .link-row { text-align: center; font-size: 14px; color: var(--gris); }
-  .link-row a { color: var(--verde); font-weight: 600; }
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(26,122,60,0.45); }
+
+  .auth-link-row { text-align: center; font-size: 14px; color: #777; margin-top: 20px; }
+  .auth-link-row a { color: #1a7a3c; font-weight: 700; }
+
+  @media (max-width: 768px) {
+    .auth-page { grid-template-columns: 1fr; }
+    .auth-deco  { display: none; }
+    .auth-form-side { padding: 40px 24px; }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="auth-wrap">
-  <div class="auth-card">
-    <div class="auth-logo"><span>Artesa<em>Market</em></span></div>
-    <h2>Crear cuenta</h2>
-    <p class="sub">¿Cómo quieres unirte a ArtesaMarket?</p>
+<div class="auth-page">
 
-    <form method="POST" action="{{ url_for('registro') }}">
+  <!-- DECORATIVO -->
+  <div class="auth-deco">
+    <div class="deco-badge">✨ Únete gratis hoy</div>
+    <div class="deco-emoji">🌿</div>
+    <h2 class="deco-title">Sé parte de <em>ArtesaMarket</em></h2>
+    <p class="deco-sub">Tanto si quieres comprar como si quieres vender, tenemos un lugar para ti</p>
+    <div class="deco-roles">
+      <div class="deco-role-card">
+        <div class="ico">🛍️</div>
+        <div class="name">Comprador</div>
+        <div class="desc">Descubre piezas únicas hechas a mano</div>
+      </div>
+      <div class="deco-role-card">
+        <div class="ico">🎨</div>
+        <div class="name">Artesano</div>
+        <div class="desc">Vende tus creaciones al mundo</div>
+      </div>
+    </div>
+  </div>
 
-      <!-- SELECTOR DE ROL -->
-      <div class="rol-selector">
-        <div class="rol-opt">
-          <input type="radio" name="rol" id="rol-cliente" value="cliente" checked/>
-          <label class="rol-label" for="rol-cliente">
-            <span class="rol-icon">🛍️</span>
-            <span class="rol-name">Cliente</span>
-            <span class="rol-desc">Quiero comprar artesanías únicas</span>
-          </label>
+  <!-- FORMULARIO -->
+  <div class="auth-form-side">
+    <div class="auth-box">
+
+      <div class="auth-logo">🧺 Artesa<span>Market</span></div>
+      <h2>Crear cuenta</h2>
+      <p class="auth-sub">¿Cómo quieres unirte?</p>
+
+      <form method="POST" action="{{ url_for('registro') }}">
+
+        <!-- ROL -->
+        <div class="rol-grid">
+          <div class="rol-opt">
+            <input type="radio" name="rol" id="r-cliente" value="cliente" checked/>
+            <label class="rol-label" for="r-cliente">
+              <span class="ico">🛍️</span>
+              <span class="nm">Cliente</span>
+              <span class="ds">Quiero comprar artesanías únicas</span>
+            </label>
+          </div>
+          <div class="rol-opt">
+            <input type="radio" name="rol" id="r-artesano" value="artesano"/>
+            <label class="rol-label" for="r-artesano">
+              <span class="ico">🎨</span>
+              <span class="nm">Artesano</span>
+              <span class="ds">Quiero vender mis creaciones</span>
+            </label>
+          </div>
         </div>
-        <div class="rol-opt">
-          <input type="radio" name="rol" id="rol-artesano" value="artesano"/>
-          <label class="rol-label" for="rol-artesano">
-            <span class="rol-icon">🎨</span>
-            <span class="rol-name">Artesano</span>
-            <span class="rol-desc">Quiero vender mis creaciones</span>
-          </label>
-        </div>
-      </div>
 
-      <!-- CAMPOS COMUNES -->
-      <div class="field">
-        <label>Nombre completo</label>
-        <input type="text" name="nombre" placeholder="Tu nombre" required/>
-      </div>
-      <div class="field">
-        <label>Correo electrónico</label>
-        <input type="email" name="correo" placeholder="tu@correo.com" required/>
-      </div>
-      <div class="field">
-        <label>Contraseña</label>
-        <input type="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6"/>
-      </div>
-
-      <!-- CAMPOS EXTRA PARA ARTESANO -->
-      <div class="artesano-fields" id="artesano-extra">
+        <!-- CAMPOS BASE -->
         <div class="field">
-          <label>Región / Departamento 📍</label>
-          <input type="text" name="region" placeholder="Ej: Boyacá, La Guajira…"/>
+          <label>Nombre completo</label>
+          <div class="field-wrap">
+            <span class="field-icon">👤</span>
+            <input type="text" name="nombre" placeholder="Tu nombre" required/>
+          </div>
         </div>
         <div class="field">
-          <label>Cuéntanos sobre tu trabajo ✍️</label>
-          <textarea name="bio" placeholder="¿Qué tipo de artesanías haces? ¿Cuál es tu tradición?"></textarea>
+          <label>Correo electrónico</label>
+          <div class="field-wrap">
+            <span class="field-icon">✉️</span>
+            <input type="email" name="correo" placeholder="tu@correo.com" required/>
+          </div>
         </div>
+        <div class="field">
+          <label>Contraseña</label>
+          <div class="field-wrap">
+            <span class="field-icon">🔑</span>
+            <input type="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6"/>
+          </div>
+        </div>
+
+        <!-- CAMPOS ARTESANO -->
+        <div class="artesano-extra" id="artesano-extra">
+          <div class="section-sep">Perfil de artesano</div>
+          <div class="field">
+            <label>Región / Departamento 📍</label>
+            <div class="field-wrap">
+              <span class="field-icon">📍</span>
+              <input type="text" name="region" placeholder="Ej: Boyacá, La Guajira…"/>
+            </div>
+          </div>
+          <div class="field">
+            <label>Cuéntanos sobre tu trabajo ✍️</label>
+            <textarea name="bio" placeholder="¿Qué tipo de artesanías haces?"></textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="btn-submit">
+          Crear cuenta como Cliente 🛍️
+        </button>
+      </form>
+
+      <div class="auth-link-row">
+        ¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Iniciar sesión →</a>
       </div>
 
-      <button type="submit" class="btn-submit" id="btn-texto">Crear cuenta como Cliente</button>
-    </form>
-
-    <div class="divider">¿Ya tienes cuenta?</div>
-    <div class="link-row"><a href="{{ url_for('login') }}">Iniciar sesión →</a></div>
+    </div>
   </div>
 </div>
 {% endblock %}
@@ -132,18 +249,17 @@
 <script>
   const radios = document.querySelectorAll('input[name="rol"]');
   const extra  = document.getElementById('artesano-extra');
-  const btn    = document.getElementById('btn-texto');
+  const btn    = document.getElementById('btn-submit');
 
-  radios.forEach(r => {
-    r.addEventListener('change', () => {
-      if (r.value === 'artesano') {
-        extra.classList.add('visible');
-        btn.textContent = 'Crear cuenta como Artesano 🎨';
-      } else {
-        extra.classList.remove('visible');
-        btn.textContent = 'Crear cuenta como Cliente 🛍️';
-      }
-    });
-  });
+  radios.forEach(r => r.addEventListener('change', () => {
+    if (r.value === 'artesano') {
+      extra.classList.add('visible');
+      btn.textContent = 'Crear cuenta como Artesano 🎨';
+    } else {
+      extra.classList.remove('visible');
+      btn.textContent = 'Crear cuenta como Cliente 🛍️';
+    }
+  }));
 </script>
 {% endblock %}
+
