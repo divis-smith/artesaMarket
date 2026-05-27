@@ -2,169 +2,495 @@
 {% block title %}Panel Admin{% endblock %}
 
 {% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
-  .admin-wrap { padding: 84px 0 60px; min-height: 100vh; background: #f8f9fb; }
+  body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f0f2f5; }
 
-  /* Header admin */
-  .admin-header {
-    background: linear-gradient(135deg, #1e1b4b, #4338ca);
-    color: white; padding: 36px 48px;
-    display: flex; align-items: center; gap: 20px;
+  .admin-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+    padding-top: 64px;
   }
-  .admin-header .icon { font-size: 48px; }
-  .admin-header h1 { font-family: 'Playfair Display'; font-size: 30px; font-weight: 900; }
-  .admin-header p  { opacity: 0.75; font-size: 14px; margin-top: 4px; }
 
-  /* Stats */
-  .stats-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
-    gap: 20px; padding: 32px 48px 0;
+  /* ── SIDEBAR ── */
+  .admin-sidebar {
+    background: linear-gradient(180deg, #0f1729 0%, #1a2744 100%);
+    padding: 32px 0; position: sticky; top: 64px;
+    height: calc(100vh - 64px); overflow-y: auto;
+    display: flex; flex-direction: column;
   }
+  .sidebar-brand {
+    padding: 0 24px 28px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 20px;
+  }
+  .sidebar-brand .logo {
+    font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900; color: white;
+  }
+  .sidebar-brand .logo span { color: #f59e0b; }
+  .sidebar-brand .badge {
+    display: inline-block; margin-top: 6px;
+    background: rgba(124,58,237,0.3); border: 1px solid rgba(124,58,237,0.5);
+    color: #c4b5fd; font-size: 11px; font-weight: 700;
+    padding: 3px 10px; border-radius: 100px; letter-spacing: 1px; text-transform: uppercase;
+  }
+  .sidebar-section { padding: 0 16px; margin-bottom: 8px; }
+  .sidebar-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.3);
+    letter-spacing: 1.5px; text-transform: uppercase; padding: 0 8px; margin-bottom: 8px; }
+  .sidebar-btn {
+    width: 100%; display: flex; align-items: center; gap: 12px;
+    padding: 11px 12px; border-radius: 10px; border: none;
+    background: transparent; color: rgba(255,255,255,0.6);
+    font-family: 'Plus Jakarta Sans'; font-size: 14px; font-weight: 500;
+    cursor: pointer; text-align: left; transition: all 0.2s; margin-bottom: 4px;
+  }
+  .sidebar-btn:hover  { background: rgba(255,255,255,0.08); color: white; }
+  .sidebar-btn.active { background: rgba(255,255,255,0.12); color: white; font-weight: 600; }
+  .sidebar-btn .ico   { font-size: 18px; width: 24px; text-align: center; }
+  .sidebar-btn .count {
+    margin-left: auto; background: rgba(255,255,255,0.15);
+    color: white; font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 100px;
+  }
+  .sidebar-footer { margin-top: auto; padding: 20px 24px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .sidebar-footer a {
+    display: flex; align-items: center; gap: 10px;
+    color: rgba(255,255,255,0.5); font-size: 13px; text-decoration: none;
+    transition: color 0.2s;
+  }
+  .sidebar-footer a:hover { color: white; }
+
+  /* ── CONTENIDO PRINCIPAL ── */
+  .admin-main { padding: 32px; overflow-y: auto; }
+
+  /* Header */
+  .admin-topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px;
+  }
+  .admin-topbar h1 {
+    font-family: 'Fraunces', serif; font-size: 28px; font-weight: 900; color: #0f1729;
+  }
+  .admin-topbar p { color: #777; font-size: 14px; margin-top: 2px; }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .admin-avatar {
+    width: 40px; height: 40px; border-radius: 100%; background: linear-gradient(135deg, #7c3aed, #4338ca);
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+
+  /* Stats cards */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 28px; }
   .stat-card {
-    background: white; border-radius: 16px; padding: 24px;
-    text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    background: white; border-radius: 18px; padding: 24px 22px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05); position: relative; overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.04);
   }
-  .stat-card .num { font-family: 'Playfair Display'; font-size: 38px; font-weight: 900; }
-  .stat-card .lbl { font-size: 13px; color: var(--gris); margin-top: 4px; }
-  .stat-card.verde .num { color: var(--verde); }
-  .stat-card.tierra .num { color: var(--tierra); }
-  .stat-card.purpura .num { color: #7c3aed; }
-  .stat-card.azul .num { color: #2563eb; }
+  .stat-card::after {
+    content: attr(data-emoji); position: absolute; right: -4px; bottom: -8px;
+    font-size: 56px; opacity: 0.07;
+  }
+  .stat-card .s-label { font-size: 12px; font-weight: 700; color: #aaa; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 10px; }
+  .stat-card .s-num { font-family: 'Fraunces', serif; font-size: 38px; font-weight: 900; line-height: 1; }
+  .stat-card .s-sub  { font-size: 12px; color: #aaa; margin-top: 6px; }
+  .stat-card.c-verde  .s-num { color: #1a7a3c; }
+  .stat-card.c-tierra .s-num { color: #c8713a; }
+  .stat-card.c-azul   .s-num { color: #2563eb; }
+  .stat-card.c-purp   .s-num { color: #7c3aed; }
 
-  /* Tablas */
-  .tables { padding: 32px 48px; display: flex; flex-direction: column; gap: 40px; }
-  .table-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
-  .table-title {
-    padding: 20px 28px; font-family: 'Playfair Display'; font-size: 20px; font-weight: 900;
-    border-bottom: 1px solid rgba(0,0,0,0.06); display: flex; align-items: center; gap: 10px;
+  /* Tabs */
+  .tab-nav { display: flex; gap: 6px; margin-bottom: 22px; background: white; padding: 6px; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); width: fit-content; }
+  .tab-btn {
+    padding: 9px 20px; border-radius: 10px; border: none;
+    background: transparent; font-family: 'Plus Jakarta Sans'; font-size: 14px; font-weight: 600;
+    color: #888; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 7px;
   }
+  .tab-btn.active { background: #0f1729; color: white; }
+  .tab-btn:not(.active):hover { background: #f5f5f5; color: #333; }
+  .tab-badge { background: rgba(255,255,255,0.25); font-size: 11px; padding: 1px 7px; border-radius: 100px; }
+  .tab-btn:not(.active) .tab-badge { background: #eee; color: #888; }
+
+  /* Panels */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* Tabla card */
+  .data-card { background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.04); }
+  .data-card-head {
+    padding: 20px 26px; display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .data-card-head h3 { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 900; color: #0f1729; }
+  .data-card-head .head-meta { font-size: 13px; color: #aaa; }
+
   table { width: 100%; border-collapse: collapse; }
-  th { padding: 13px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gris); background: #fafafa; text-align: left; }
-  td { padding: 14px 20px; font-size: 14px; border-top: 1px solid rgba(0,0,0,0.04); vertical-align: middle; }
-  tr:hover td { background: #fafafa; }
-  .badge-rol { font-size: 11px; padding: 3px 10px; border-radius: 100px; font-weight: 700; text-transform: uppercase; }
-  .badge-artesano { background: var(--tierra-cl); color: var(--tierra); }
-  .badge-admin    { background: #ede9fe; color: #7c3aed; }
-  .badge-cliente  { background: var(--verde-cl); color: var(--verde); }
+  thead tr { background: #fafbfc; }
+  th { padding: 13px 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; color: #aaa; text-align: left; }
+  td { padding: 15px 20px; font-size: 14px; border-top: 1px solid #f5f5f5; vertical-align: middle; }
+  tbody tr:hover td { background: #fafbfc; }
+
+  .user-cell { display: flex; align-items: center; gap: 12px; }
+  .user-avatar {
+    width: 36px; height: 36px; border-radius: 100%; display: flex;
+    align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;
+  }
+  .ua-cliente  { background: #e8f5ee; }
+  .ua-artesano { background: #fdf0e8; }
+  .ua-admin    { background: #f3e8ff; }
+  .user-name { font-weight: 700; color: #0f1729; font-size: 14px; }
+  .user-email { font-size: 12px; color: #aaa; }
+
+  .badge-rol { display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; padding: 4px 10px; border-radius: 100px; font-weight: 700; }
+  .badge-cliente  { background: #e8f5ee; color: #1a7a3c; }
+  .badge-artesano { background: #fdf0e8; color: #c8713a; }
+  .badge-admin    { background: #f3e8ff; color: #7c3aed; }
+
+  .id-chip { background: #f5f5f5; color: #aaa; font-size: 11px; font-weight: 700;
+    padding: 3px 8px; border-radius: 6px; font-family: monospace; }
+
   .btn-del {
     background: #fef2f2; color: #dc2626; border: none;
-    padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
-    cursor: pointer; transition: background 0.2s;
+    padding: 7px 14px; border-radius: 9px; font-size: 12px; font-weight: 700;
+    cursor: pointer; transition: background 0.2s, transform 0.15s;
+    font-family: 'Plus Jakarta Sans';
   }
-  .btn-del:hover { background: #fee2e2; }
-  .no-data { padding: 32px; text-align: center; color: var(--gris); font-size: 14px; }
+  .btn-del:hover { background: #fee2e2; transform: translateY(-1px); }
 
-  @media (max-width: 700px) {
-    .admin-header { padding: 28px 20px; }
-    .stats-grid { padding: 20px; }
-    .tables { padding: 20px; }
-    th, td { padding: 10px 14px; }
+  .no-data {
+    padding: 48px; text-align: center; color: #bbb;
+  }
+  .no-data .nd-ico { font-size: 40px; margin-bottom: 12px; }
+  .no-data p { font-size: 14px; }
+
+  .price-tag { color: #c8713a; font-weight: 700; font-size: 13px; }
+
+  .region-tag { background: #f0fdf4; color: #1a7a3c; font-size: 12px;
+    padding: 3px 10px; border-radius: 100px; font-weight: 600; }
+
+  @media (max-width: 900px) {
+    .admin-layout { grid-template-columns: 1fr; }
+    .admin-sidebar { display: none; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .admin-main { padding: 20px 16px; }
+    .stats-row { grid-template-columns: 1fr; }
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="admin-wrap">
+<div class="admin-layout">
 
-  <!-- HEADER -->
-  <div class="admin-header">
-    <div class="icon">⚙️</div>
-    <div>
-      <h1>Panel de Administración</h1>
-      <p>ArtesaMarket · Acceso restringido</p>
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-brand">
+      <div class="logo">Artesa<span>Market</span></div>
+      <span class="badge">Admin</span>
     </div>
-  </div>
 
-  <!-- STATS -->
-  <div class="stats-grid">
-    <div class="stat-card verde">
-      <div class="num">{{ stats.total_usuarios }}</div>
-      <div class="lbl">Usuarios totales</div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Panel</div>
+      <button class="sidebar-btn active" onclick="setTab('overview')">
+        <span class="ico">📊</span> Resumen
+      </button>
     </div>
-    <div class="stat-card tierra">
-      <div class="num">{{ stats.total_artesanos }}</div>
-      <div class="lbl">Artesanos</div>
-    </div>
-    <div class="stat-card azul">
-      <div class="num">{{ stats.total_clientes }}</div>
-      <div class="lbl">Clientes</div>
-    </div>
-    <div class="stat-card purpura">
-      <div class="num">{{ stats.total_productos }}</div>
-      <div class="lbl">Productos</div>
-    </div>
-  </div>
 
-  <!-- TABLAS -->
-  <div class="tables">
+    <div class="sidebar-section" style="margin-top:8px;">
+      <div class="sidebar-label">Usuarios</div>
+      <button class="sidebar-btn" onclick="setTab('compradores')">
+        <span class="ico">🛍️</span> Compradores
+        <span class="count">{{ stats.total_clientes }}</span>
+      </button>
+      <button class="sidebar-btn" onclick="setTab('vendedores')">
+        <span class="ico">🎨</span> Vendedores
+        <span class="count">{{ stats.total_artesanos }}</span>
+      </button>
+      <button class="sidebar-btn" onclick="setTab('todos')">
+        <span class="ico">👥</span> Todos
+        <span class="count">{{ stats.total_usuarios }}</span>
+      </button>
+    </div>
 
-    <!-- USUARIOS -->
-    <div class="table-card">
-      <div class="table-title">👥 Usuarios registrados</div>
-      {% if usuarios %}
-      <table>
-        <thead>
+    <div class="sidebar-section" style="margin-top:8px;">
+      <div class="sidebar-label">Contenido</div>
+      <button class="sidebar-btn" onclick="setTab('productos')">
+        <span class="ico">🏺</span> Productos
+        <span class="count">{{ stats.total_productos }}</span>
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      <a href="{{ url_for('logout') }}">🚪 Cerrar sesión</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="admin-main">
+
+    <!-- TOPBAR -->
+    <div class="admin-topbar">
+      <div>
+        <h1>Panel de Administración</h1>
+        <p>Bienvenido, <strong>{{ session['nombre'] }}</strong> · ArtesaMarket</p>
+      </div>
+      <div class="topbar-right">
+        <div class="admin-avatar">⚙️</div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card c-verde" data-emoji="👥">
+        <div class="s-label">Total usuarios</div>
+        <div class="s-num">{{ stats.total_usuarios }}</div>
+        <div class="s-sub">registrados</div>
+      </div>
+      <div class="stat-card c-tierra" data-emoji="🎨">
+        <div class="s-label">Artesanos</div>
+        <div class="s-num">{{ stats.total_artesanos }}</div>
+        <div class="s-sub">vendedores activos</div>
+      </div>
+      <div class="stat-card c-azul" data-emoji="🛍️">
+        <div class="s-label">Clientes</div>
+        <div class="s-num">{{ stats.total_clientes }}</div>
+        <div class="s-sub">compradores</div>
+      </div>
+      <div class="stat-card c-purp" data-emoji="🏺">
+        <div class="s-label">Productos</div>
+        <div class="s-num">{{ stats.total_productos }}</div>
+        <div class="s-sub">publicados</div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tab-nav">
+      <button class="tab-btn active" id="tab-overview"   onclick="setTab('overview')">📊 Resumen</button>
+      <button class="tab-btn"        id="tab-compradores" onclick="setTab('compradores')">🛍️ Compradores <span class="tab-badge">{{ stats.total_clientes }}</span></button>
+      <button class="tab-btn"        id="tab-vendedores"  onclick="setTab('vendedores')">🎨 Vendedores <span class="tab-badge">{{ stats.total_artesanos }}</span></button>
+      <button class="tab-btn"        id="tab-todos"       onclick="setTab('todos')">👥 Todos</button>
+      <button class="tab-btn"        id="tab-productos"   onclick="setTab('productos')">🏺 Productos</button>
+    </div>
+
+    <!-- PANEL: RESUMEN -->
+    <div class="tab-panel active" id="panel-overview">
+      <div class="data-card">
+        <div class="data-card-head">
+          <h3>Últimos usuarios registrados</h3>
+          <span class="head-meta">{{ stats.total_usuarios }} en total</span>
+        </div>
+        {% if usuarios %}
+        <table>
+          <thead><tr>
+            <th>ID</th><th>Usuario</th><th>Rol</th><th>Región</th><th>Acción</th>
+          </tr></thead>
+          <tbody>
+          {% for u in usuarios[:10] %}
           <tr>
-            <th>ID</th><th>Nombre</th><th>Correo</th><th>Rol</th><th>Región</th><th>Acción</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for u in usuarios %}
-          <tr>
-            <td style="color:var(--gris)">#{{ u.id }}</td>
-            <td><strong>{{ u.nombre }}</strong></td>
-            <td>{{ u.email }}</td>
-            <td><span class="badge-rol badge-{{ u.rol }}">{{ u.rol }}</span></td>
-            <td>{{ u.region or '—' }}</td>
+            <td><span class="id-chip">#{{ u['id'] }}</span></td>
             <td>
-              {% if u.rol != 'admin' %}
-              <a href="{{ url_for('eliminar_usuario', uid=u.id) }}"
-                 onclick="return confirm('¿Eliminar usuario {{ u.nombre }}?')"
-                 class="btn-del">Eliminar</a>
+              <div class="user-cell">
+                <div class="user-avatar ua-{{ u['rol'] }}">
+                  {% if u['rol']=='artesano' %}🎨{% elif u['rol']=='admin' %}⚙️{% else %}🛍️{% endif %}
+                </div>
+                <div>
+                  <div class="user-name">{{ u['nombre'] }}</div>
+                  <div class="user-email">{{ u['correo'] }}</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge-rol badge-{{ u['rol'] }}">{{ u['rol'] }}</span></td>
+            <td>{% if u['region'] %}<span class="region-tag">{{ u['region'] }}</span>{% else %}<span style="color:#ddd">—</span>{% endif %}</td>
+            <td>
+              {% if u['rol'] != 'admin' %}
+              <a href="{{ url_for('eliminar_usuario', uid=u['id']) }}"
+                 onclick="return confirm('¿Eliminar a {{ u['nombre'] }}?')"
+                 class="btn-del">🗑 Eliminar</a>
               {% else %}
-              <span style="font-size:12px;color:var(--gris)">Protegido</span>
+              <span style="font-size:12px;color:#bbb">Protegido</span>
               {% endif %}
             </td>
           </tr>
           {% endfor %}
-        </tbody>
-      </table>
-      {% else %}
-      <p class="no-data">Sin usuarios registrados.</p>
-      {% endif %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="no-data"><div class="nd-ico">👤</div><p>Sin usuarios registrados aún.</p></div>
+        {% endif %}
+      </div>
     </div>
 
-    <!-- PRODUCTOS -->
-    <div class="table-card">
-      <div class="table-title">🏺 Productos publicados</div>
-      {% if productos %}
-      <table>
-        <thead>
+    <!-- PANEL: COMPRADORES -->
+    <div class="tab-panel" id="panel-compradores">
+      <div class="data-card">
+        <div class="data-card-head">
+          <h3>🛍️ Compradores</h3>
+          <span class="head-meta">{{ stats.total_clientes }} clientes</span>
+        </div>
+        {% if compradores %}
+        <table>
+          <thead><tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Región</th><th>Acción</th></tr></thead>
+          <tbody>
+          {% for u in compradores %}
           <tr>
-            <th>ID</th><th>Producto</th><th>Precio</th><th>Artesano</th><th>Acción</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for p in productos %}
-          <tr>
-            <td style="color:var(--gris)">#{{ p.id }}</td>
-            <td>{{ p.emoji }} <strong>{{ p.nombre }}</strong></td>
-            <td style="color:var(--tierra);font-weight:600">${{ "{:,.0f}".format(p.precio) }} COP</td>
-            <td>{{ p['artesano'] or '—' }}</td>
+            <td><span class="id-chip">#{{ u['id'] }}</span></td>
             <td>
-              <a href="{{ url_for('eliminar_producto', pid=p.id) }}"
-                 onclick="return confirm('¿Eliminar producto {{ p.nombre }}?')"
-                 class="btn-del">Eliminar</a>
+              <div class="user-cell">
+                <div class="user-avatar ua-cliente">🛍️</div>
+                <div class="user-name">{{ u['nombre'] }}</div>
+              </div>
+            </td>
+            <td style="color:#777;">{{ u['correo'] }}</td>
+            <td>{% if u['region'] %}<span class="region-tag">{{ u['region'] }}</span>{% else %}<span style="color:#ddd">—</span>{% endif %}</td>
+            <td>
+              <a href="{{ url_for('eliminar_usuario', uid=u['id']) }}"
+                 onclick="return confirm('¿Eliminar a {{ u['nombre'] }}?')"
+                 class="btn-del">🗑 Eliminar</a>
             </td>
           </tr>
           {% endfor %}
-        </tbody>
-      </table>
-      {% else %}
-      <p class="no-data">Sin productos publicados.</p>
-      {% endif %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="no-data"><div class="nd-ico">🛍️</div><p>Sin compradores registrados.</p></div>
+        {% endif %}
+      </div>
     </div>
 
-  </div>
+    <!-- PANEL: VENDEDORES -->
+    <div class="tab-panel" id="panel-vendedores">
+      <div class="data-card">
+        <div class="data-card-head">
+          <h3>🎨 Vendedores / Artesanos</h3>
+          <span class="head-meta">{{ stats.total_artesanos }} artesanos</span>
+        </div>
+        {% if vendedores %}
+        <table>
+          <thead><tr><th>ID</th><th>Artesano</th><th>Correo</th><th>Región</th><th>Bio</th><th>Acción</th></tr></thead>
+          <tbody>
+          {% for u in vendedores %}
+          <tr>
+            <td><span class="id-chip">#{{ u['id'] }}</span></td>
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar ua-artesano">🎨</div>
+                <div class="user-name">{{ u['nombre'] }}</div>
+              </div>
+            </td>
+            <td style="color:#777;">{{ u['correo'] }}</td>
+            <td>{% if u['region'] %}<span class="region-tag">{{ u['region'] }}</span>{% else %}<span style="color:#ddd">—</span>{% endif %}</td>
+            <td style="font-size:13px;color:#888;max-width:180px;">{{ (u['bio'] or '—')[:60] }}{% if u['bio'] and u['bio']|length > 60 %}…{% endif %}</td>
+            <td>
+              <a href="{{ url_for('eliminar_usuario', uid=u['id']) }}"
+                 onclick="return confirm('¿Eliminar a {{ u['nombre'] }}?')"
+                 class="btn-del">🗑 Eliminar</a>
+            </td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="no-data"><div class="nd-ico">🎨</div><p>Sin artesanos registrados.</p></div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- PANEL: TODOS LOS USUARIOS -->
+    <div class="tab-panel" id="panel-todos">
+      <div class="data-card">
+        <div class="data-card-head">
+          <h3>👥 Todos los usuarios</h3>
+          <span class="head-meta">{{ stats.total_usuarios }} en total</span>
+        </div>
+        {% if usuarios %}
+        <table>
+          <thead><tr><th>ID</th><th>Usuario</th><th>Rol</th><th>Región</th><th>Acción</th></tr></thead>
+          <tbody>
+          {% for u in usuarios %}
+          <tr>
+            <td><span class="id-chip">#{{ u['id'] }}</span></td>
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar ua-{{ u['rol'] }}">
+                  {% if u['rol']=='artesano' %}🎨{% elif u['rol']=='admin' %}⚙️{% else %}🛍️{% endif %}
+                </div>
+                <div>
+                  <div class="user-name">{{ u['nombre'] }}</div>
+                  <div class="user-email">{{ u['correo'] }}</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge-rol badge-{{ u['rol'] }}">{{ u['rol'] }}</span></td>
+            <td>{% if u['region'] %}<span class="region-tag">{{ u['region'] }}</span>{% else %}<span style="color:#ddd">—</span>{% endif %}</td>
+            <td>
+              {% if u['rol'] != 'admin' %}
+              <a href="{{ url_for('eliminar_usuario', uid=u['id']) }}"
+                 onclick="return confirm('¿Eliminar a {{ u['nombre'] }}?')"
+                 class="btn-del">🗑 Eliminar</a>
+              {% else %}
+              <span style="font-size:12px;color:#bbb">Protegido</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="no-data"><div class="nd-ico">👥</div><p>Sin usuarios.</p></div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- PANEL: PRODUCTOS -->
+    <div class="tab-panel" id="panel-productos">
+      <div class="data-card">
+        <div class="data-card-head">
+          <h3>🏺 Productos publicados</h3>
+          <span class="head-meta">{{ stats.total_productos }} productos</span>
+        </div>
+        {% if productos %}
+        <table>
+          <thead><tr><th>ID</th><th>Producto</th><th>Precio</th><th>Artesano</th><th>Acción</th></tr></thead>
+          <tbody>
+          {% for p in productos %}
+          <tr>
+            <td><span class="id-chip">#{{ p['id'] }}</span></td>
+            <td>{{ p['emoji'] }} <strong>{{ p['nombre'] }}</strong></td>
+            <td><span class="price-tag">${{ "{:,.0f}".format(p['precio']) }} COP</span></td>
+            <td>{{ p['artesano'] or '—' }}</td>
+            <td>
+              <a href="{{ url_for('eliminar_producto', pid=p['id']) }}"
+                 onclick="return confirm('¿Eliminar {{ p['nombre'] }}?')"
+                 class="btn-del">🗑 Eliminar</a>
+            </td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="no-data"><div class="nd-ico">🏺</div><p>Sin productos publicados.</p></div>
+        {% endif %}
+      </div>
+    </div>
+
+  </main>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function setTab(name) {
+    // Ocultar todos los paneles
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+    // Activar el seleccionado
+    const panel = document.getElementById('panel-' + name);
+    const tabBtn = document.getElementById('tab-' + name);
+    if (panel) panel.classList.add('active');
+    if (tabBtn) tabBtn.classList.add('active');
+  }
+</script>
 {% endblock %}
